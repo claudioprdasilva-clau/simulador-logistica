@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Gêmeo Digital - Simulação Logística 3D</title>
+    <!-- Carrega a biblioteca estável do A-Frame para Realidade Virtual -->
+    <script src="https://aframe.io"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <!-- Link oficial do seu vídeo gerado no Gemini Omni e montado no Canva -->
+        <video id="logistica-video" src="https://drive.google.com/uc?export=download&id=1I5V4vqTVOhOSSH1cV5V4OG8ZmepDTPG1" crossorigin="anonymous" playsinline type="video/mp4"></video>
+      </a-assets>
+
+      <!-- Transforma o seu vídeo em uma esfera imersiva de 360° ao redor do visitante -->
+      <a-videosphere src="#logistica-video" rotation="0 -90 0"></a-videosphere>
+
+      <!-- Configura a câmera e o ponteiro visual interno dos óculos -->
+      <a-camera look-controls>
+        <a-cursor></a-cursor>
+      </a-camera>
+      
+      <!-- Ativa o suporte nativo para os gatilhos dos controles do Meta Quest -->
+      
+    </a-scene>
+
+    <script>
+      const video = document.querySelector('#logistica-video');
+      // Define os tempos exatos de parada (10s, 20s, 30s, 40s e o fim em 50s)
+      const timeStamps = [10, 20, 30, 40, 50]; 
+      let stageIndex = 0;
+
+      // Função para avançar as estações ou reiniciar o ciclo no fim do vídeo
+      function avancarEstacao() {
+        if (video.paused) {
+          // Se chegou muito perto do fim (50s), reseta tudo para o próximo visitante
+          if (video.currentTime >= video.duration - 0.5) {
+            video.currentTime = 0;
+            stageIndex = 0;
+          }
+          video.play();
+        }
+      }
+
+      // Escuta os cliques físicos na tela, mouse ou gatilho (Trigger) dos óculos VR
+      window.addEventListener('click', avancarEstacao);
+      window.addEventListener('touchstart', avancarEstacao);
+
+      // Gerencia as pausas automáticas ao final de cada uma das 5 áreas logísticas
+      video.ontimeupdate = () => {
+        if (stageIndex < timeStamps.length && video.currentTime >= timeStamps[stageIndex]) {
+          video.pause();
+          stageIndex++;
+        }
+      };
+    </script>
+  </body>
+</html>
+
