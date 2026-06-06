@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8">
     <title>Gêmeo Digital - Simulação Logística 3D</title>
-    <!-- Carrega a biblioteca estável do A-Frame para Realidade Virtual -->
+    <!-- Biblioteca estável do A-Frame para Realidade Virtual -->
     <script src="https://aframe.io"></script>
   </head>
   <body>
     <a-scene>
       <a-assets>
-        <!-- Link oficial do seu vídeo gerado no Gemini Omni e montado no Canva -->
-        <video id="logistica-video" src="https://www.dropbox.com/scl/fi/jajbcl2t60uzd9slq5yp9/Digital-Twins-para-culos-3d-2026_teste1-2.mp4?rlkey=0lcx56j0v7yzigmex1v9k5yda&st=sxbe7v40&dl=1" crossorigin="anonymous" playsinline type="video/mp4"></video>
+        <!-- Link oficial do seu vídeo do Dropbox configurado com dl=1 -->
+        <video id="logistica-video" src="https://dropbox.com" crossorigin="anonymous" playsinline type="video/mp4"></video>
       </a-assets>
 
-      <!-- Transforma o seu vídeo em uma esfera imersiva de 360° ao redor do visitante -->
+      <!-- Transforma o seu vídeo do Gemini Omni em uma esfera imersiva de 360° -->
       <a-videosphere src="#logistica-video" rotation="0 -90 0"></a-videosphere>
 
       <!-- Configura a câmera e o ponteiro visual interno dos óculos -->
@@ -27,34 +27,48 @@
 
     <script>
       const video = document.querySelector('#logistica-video');
-      // Define os tempos exatos de parada (10s, 20s, 30s, 40s e o fim em 50s)
-      const timeStamps = [10, 20, 30, 40, 50]; 
-      let stageIndex = 0;
+      // Marcadores fixos de tempo para as 5 áreas logísticas (10s, 20s, 30s, 40s)
+      const paradas = [10, 20, 30, 40];
+      let proximaParadaIdx = 0;
 
-      // Função para avançar as estações ou reiniciar o ciclo no fim do vídeo
-      function avancarEstacao() {
+      // Inicia o vídeo pausado na primeira cena assim que a página é carregada
+      window.addEventListener('load', () => {
+        video.pause();
+        video.currentTime = 0;
+      });
+
+      // Função para avançar as estações acionada pelo controle ou clique na tela
+      function gerenciarFluxo() {
         if (video.paused) {
-          // Se chegou muito perto do fim (50s), reseta tudo para o próximo visitante
-          if (video.currentTime >= video.duration - 0.5) {
+          // Se chegou muito perto do final do vídeo, reseta todo o ciclo para o próximo visitante
+          if (video.currentTime >= 49) {
             video.currentTime = 0;
-            stageIndex = 0;
+            proximaParadaIdx = 0;
+            video.pause();
+          } else {
+            video.play();
           }
-          video.play();
         }
       }
 
-      // Escuta os cliques físicos na tela, mouse ou gatilho (Trigger) dos óculos VR
-      window.addEventListener('click', avancarEstacao);
-      window.addEventListener('touchstart', avancarEstacao);
+      // Escuta os cliques físicos na tela do celular, mouse no laptop ou gatilho dos óculos VR
+      window.addEventListener('click', gerenciarFluxo);
+      window.addEventListener('touchstart', gerenciarFluxo);
 
-      // Gerencia as pausas automáticas ao final de cada uma das 5 áreas logísticas
-      video.ontimeupdate = () => {
-        if (stageIndex < timeStamps.length && video.currentTime >= timeStamps[stageIndex]) {
+      // Monitora a reprodução segundo a segundo para pausar na marca correta de forma segura
+      video.addEventListener('timeupdate', () => {
+        if (proximaParadaIdx < paradas.length) {
+          if (video.currentTime >= paradas[proximaParadaIdx]) {
+            video.pause();
+            // Trava o vídeo exatamente na marca de tempo da estação
+            video.currentTime = paradas[proximaParadaIdx];
+            proximaParadaIdx++;
+          }
+        } else if (video.currentTime >= 49.5) {
+          // Pausa automática no final absoluto do vídeo (área do caminhão)
           video.pause();
-          stageIndex++;
         }
-      };
+      });
     </script>
   </body>
 </html>
-
